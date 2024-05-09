@@ -31,35 +31,35 @@ class ValueDeviceClass{
   late double bs; // Chế độ còi
 }
 
-Future<dynamic> RequestValue() async {
-  ApiDeviceDetails response = await RequestDevice();
-  Map<String, dynamic> userMap = response.userMap;
-  print("$userMap");
-
-  ValueDeviceClass value = new ValueDeviceClass();
-  value.status = userMap['Status'];
-  value.lastReceived = DateTime.parse(userMap['lastReceived']);
-  value.deviceName = userMap['Device_name'];
-  value.version = userMap['version_running'] == null ? '' : userMap['version_running'];
-  value.tem = userMap['lastData']['tem'];
-  value.hum = userMap['lastData']['hum'];
-  value.vMq2 = userMap['lastData']['mq2'];
-  value.dr1 = userMap['lastData']['dr1'];
-  value.dr2 = userMap['lastData']['dr2'];
-  value.dm1 = userMap['lastData']['dm1'];
-  value.dm2 = userMap['lastData']['dm2'];
-  value.ds1 = userMap['lastData']['ds1'];
-  value.ds2 = userMap['lastData']['ds2'];
-  value.fn1 = userMap['lastData']['fn1'];
-  value.fn2 = userMap['lastData']['fn2'];
-  value.fs1 = userMap['lastData']['fs1'];
-  value.fs2 = userMap['lastData']['fs2'];
-  value.ld1 = userMap['lastData']['ld1'];
-  value.ld2 = userMap['lastData']['ld2'];
-  value.lm1 = userMap['lastData']['lm1'];
-  value.lm2 = userMap['lastData']['lm2'];
-  value.ls1 = userMap['lastData']['ls1'];
-  value.ls2 = userMap['lastData']['ls2'];
-  value.bs = userMap['lastData']['bs'];
-  return value;
-}
+// Future<dynamic> RequestValue() async {
+//   ApiDeviceDetails response = await RequestDevice();
+//   Map<String, dynamic> userMap = response.userMap;
+//   print("$userMap");
+//
+//   ValueDeviceClass value = new ValueDeviceClass();
+//   value.status = userMap['Status'];
+//   value.lastReceived = DateTime.parse(userMap['lastReceived']);
+//   value.deviceName = userMap['Device_name'];
+//   value.version = userMap['version_running'] == null ? '' : userMap['version_running'];
+//   value.tem = userMap['lastData']['tem'];
+//   value.hum = userMap['lastData']['hum'];
+//   value.vMq2 = userMap['lastData']['mq2'];
+//   value.dr1 = userMap['lastData']['dr1'];
+//   value.dr2 = userMap['lastData']['dr2'];
+//   value.dm1 = userMap['lastData']['dm1'];
+//   value.dm2 = userMap['lastData']['dm2'];
+//   value.ds1 = userMap['lastData']['ds1'];
+//   value.ds2 = userMap['lastData']['ds2'];
+//   value.fn1 = userMap['lastData']['fn1'];
+//   value.fn2 = userMap['lastData']['fn2'];
+//   value.fs1 = userMap['lastData']['fs1'];
+//   value.fs2 = userMap['lastData']['fs2'];
+//   value.ld1 = userMap['lastData']['ld1'];
+//   value.ld2 = userMap['lastData']['ld2'];
+//   value.lm1 = userMap['lastData']['lm1'];
+//   value.lm2 = userMap['lastData']['lm2'];
+//   value.ls1 = userMap['lastData']['ls1'];
+//   value.ls2 = userMap['lastData']['ls2'];
+//   value.bs = userMap['lastData']['bs'];
+//   return value;
+// }

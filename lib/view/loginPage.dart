@@ -60,6 +60,8 @@ class _LoginPageState extends State<LoginPage> {
     if (response.statusResponse == 200) {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString("tokenKey", userMap["tokenkey"]);
+      await prefs.setString("username", userMap["username"]);
+
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => HomePage()));
     } else {

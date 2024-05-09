@@ -1,5 +1,5 @@
-String ip = "192.168.1.17";
-String address = "http://$ip:8888/api/";
+String ip = "https://draft.aithings.vn:6889";
+String address = "$ip/api/";
 String addressLogin = address + "LoginAPI/UsersLogin";
 String addressChangePass = address + "LoginAPI/UserChangePassword";
 String addressReadDeviceDetails = address + "DataAPI/ReadDeviceDetails";

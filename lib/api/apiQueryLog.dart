@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../res/vaule.dart';
 
 class ApiQueryLog{
-  final Map<String, dynamic> userMap;
+  final List<dynamic> userMap;
   final int statusResponse;
   final String? error;
 
@@ -32,8 +32,9 @@ Future<dynamic> QueryLog(String year, String month, String day) async {
           "day" : day
         })
     );
-    Map<String, dynamic> userMap = jsonDecode(response.toString());
     int statusResponse = response.statusCode!;
+    List<dynamic> userMap = response.data;
+    // print(userMap[0].runtimeType);
     return ApiQueryLog(userMap, statusResponse, '');
   }catch(e){
     String error = e.toString();
@@ -46,6 +47,6 @@ Future<dynamic> QueryLog(String year, String month, String day) async {
         error = "Không có kết nỗi!";
       }
     }
-    return ApiQueryLog({}, -1,error);
+    return ApiQueryLog([], -1,error);
   }
 }

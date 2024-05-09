@@ -7,7 +7,32 @@ class ValueProvider extends ChangeNotifier {
   ValueDeviceClass _value = ValueDeviceClass();
 
   ValueDeviceClass get value => _value;
-
+  ValueProvider() {
+    value.status = false;
+    value.lastReceived = DateTime.now();
+    value.deviceName = '';
+    value.version = '';
+    value.tem = -1;
+    value.hum = -1;
+    value.vMq2 = -1;
+    value.dr1 = -1;
+    value.dr2 = -1;
+    value.dm1 = -1;
+    value.dm2 = -1;
+    value.ds1 = -1;
+    value.ds2 = -1;
+    value.fn1 = -1;
+    value.fn2 = -1;
+    value.fs1 = -1;
+    value.fs2 = -1;
+    value.ld1 = -1;
+    value.ld2 = -1;
+    value.lm1 = -1;
+    value.lm2 = -1;
+    value.ls1 = -1;
+    value.ls2 = -1;
+    value.bs = -1;
+  }
   void fetchValue() async {
     ApiDeviceDetails response = await RequestDevice();
     Map<String, dynamic> userMap = response.userMap;

@@ -24,10 +24,11 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.example.smart_home"
-    compileSdkVersion flutter.compileSdkVersion
+    compileSdkVersion 34
     ndkVersion "25.1.8937393"
 
     compileOptions {
+        coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -43,6 +44,7 @@ android {
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.example.smart_home"
+        multiDexEnabled true
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion 21
@@ -65,7 +67,7 @@ flutter {
 }
 
 dependencies {
-    
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.2.2'
     constraints {
         implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0") {
             because("kotlin-stdlib-jdk7 is now a part of kotlin-stdlib")
@@ -75,4 +77,5 @@ dependencies {
         }
         implementation 'com.google.android.gms:play-services-location:21.0.0'
     }
+    implementation 'com.onesignal:OneSignal:[5.0.0, 5.99.99]'
 }

@@ -21,52 +21,97 @@ class _Setup_WifiState extends State<Setup_Wifi> {
   TextEditingController password = new TextEditingController();
   List<WiFiAccessPoint> accessPoints = [];
   StreamSubscription<List<WiFiAccessPoint>>? subscription;
+  bool get isStreaming => subscription != null;
   List<String> wifiName = [];
   String wifi = "";
+  bool shouldCheckCan = true;
+  /// Show snackbar.
+  void kShowSnackBar(BuildContext context, String message) {
+    if (kDebugMode) print(message);
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
+  }
+  Future<void> _startScan(BuildContext context) async {
+    // check if "can" startScan
+    if (shouldCheckCan) {
+      // check if can-startScan
+      // final can =
+      //     await WiFiScan.instance.canGetScannedResults(askPermissions: true);
+      final can = await WiFiScan.instance.canStartScan(askPermissions: true);
+      // if can-not, then show error
+      if (can != CanStartScan.yes) {
+        if (mounted) kShowSnackBar(context, "Cannot start scan: $can");
+        return;
+      }
+    }
 
-  void _startListeningToScannedResults() async {
-    print("Quét");
+    wifiName = [];
     var results = await WiFiScan.instance.getScannedResults();
     setState(() {
       accessPoints = results;
       wifiName = results.map((result) => result.ssid).toList();
     });
-    print("Danh sách WiFi: $wifiName");
-      wifiName = [];
-          for (var i in accessPoints) {
-            wifiName.add(i.ssid);
-          }
-    // final can =
-    //     await WiFiScan.instance.canGetScannedResults(askPermissions: true);
-    // switch (can) {
-    //   case CanGetScannedResults.yes:
-    //     Future.delayed(Duration(seconds: 5), () {
-    //       subscription =
-    //           WiFiScan.instance.onScannedResultsAvailable.listen((results) {
-    //             setState(() => accessPoints = results);
-    //           });
-    //       print("D: $accessPoints");
-    //       wifiName = [];
-    //       for (var i in accessPoints) {
-    //         wifiName.add(i.ssid);
-    //       }
-    //       print("Hoàn Thành");
-    //     });
-    //     break;
-    //   case CanGetScannedResults.notSupported:
-    //   // TODO: Handle this case.
-    //   case CanGetScannedResults.noLocationPermissionRequired:
-    //   // TODO: Handle this case.
-    //   case CanGetScannedResults.noLocationPermissionDenied:
-    //   // TODO: Handle this case.
-    //   case CanGetScannedResults.noLocationPermissionUpgradeAccuracy:
-    //   // TODO: Handle this case.
-    //   case CanGetScannedResults.noLocationServiceDisabled:
-    //   // TODO: Handle this case.
-    // }
+    for (var i in accessPoints) {
+      wifiName.add(i.ssid);
+    }
   }
+  void _startListeningToScannedResults() async {
+    print("Quét");
+    print("Danh sách WiFi: $wifiName");
+    wifiName = [];
+    var results = await WiFiScan.instance.getScannedResults();
+    setState(() {
+      accessPoints = results;
+      wifiName = results.map((result) => result.ssid).toList();
+    });
+    for (var i in accessPoints) {
+      wifiName.add(i.ssid);
+    }
+  }
+
+  String _warningName = '', _warningPass = '';
+  void _validateAndSend() {
+    String textN = name.text.trim();
+    String textP = password.text.trim();
+
+    if (textN.isEmpty) {
+      setState(() {
+        _warningName = 'Please enter some text.';
+      });
+    } else if (textP.isEmpty) {
+      setState(() {
+        _warningPass = 'Please enter some text.';
+      });
+    }
+     else {
+      // Code to send the text
+      setState(() {
+        _warningPass = ''; // Clear any previous warnings
+      });
+      // Add your code to send the text here
+      print('Text sent: $_warningPass');
+      service();
+      AwesomeDialog(
+        context: context,
+        animType: AnimType.leftSlide,
+        headerAnimationLoop: false,
+        showCloseIcon: true,
+        title: 'Setup Thành Công!',
+        desc:
+        'Tên Wifi: ${name.text}\nPassword: ${password.text}',
+        btnOkOnPress: () {
+        },
+        btnOkIcon: Icons.check_circle,
+        onDismissCallback: (type) {
+        },
+      ).show();
+    }
+  }
+
   @override
   initState() {
+    // _startScan(context);
     _startListeningToScannedResults();
     print("initState Called");
   }
@@ -84,7 +129,7 @@ class _Setup_WifiState extends State<Setup_Wifi> {
       var characteristics = service.characteristics;
       for (BluetoothCharacteristic c in characteristics) {
         if (c.properties.write) {
-          String data_sent = "w:" + wifi + "\tp:" + password.text;
+          String data_sent = "w:" + name.text + "\tp:" + password.text;
           List<int> bytes =
               utf8.encode(data_sent); // Chuyển đổi văn bản thành mảng byte
           await c.write(bytes);
@@ -92,7 +137,6 @@ class _Setup_WifiState extends State<Setup_Wifi> {
       }
     });
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -101,7 +145,33 @@ class _Setup_WifiState extends State<Setup_Wifi> {
       ),
       body: Column(
         children: [
-          NameWifi(),
+          Container(
+            padding: EdgeInsets.symmetric(vertical: 8.0),
+            child: Row(
+              children: [
+                Text("WifiName:"),
+                SizedBox(width: 8.0), // Để tạo khoảng cách giữa Text và TextField
+                Container(
+                  width: 200.0, // Chiều rộng cố định của TextField
+                  decoration: BoxDecoration(
+                    border: Border.all(), // Thêm viền để phân biệt
+                    borderRadius: BorderRadius.circular(8.0), // Bo tròn viền
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: TextField(
+                      controller: name,
+                      decoration: InputDecoration(
+                        hintText: 'Name Wifi',
+                        errorText: _warningName.isNotEmpty ? _warningName : null,
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           Container(
             padding: EdgeInsets.symmetric(vertical: 8.0),
             child: Row(
@@ -120,6 +190,7 @@ class _Setup_WifiState extends State<Setup_Wifi> {
                       controller: password,
                       decoration: InputDecoration(
                         hintText: 'Password',
+                        errorText: _warningPass.isNotEmpty ? _warningPass : null,
                         border: InputBorder.none,
                       ),
                     ),
@@ -131,35 +202,9 @@ class _Setup_WifiState extends State<Setup_Wifi> {
 
           TextButton(
               onPressed: () {
-                // _startListeningToScannedResults();
-                service();
-                AwesomeDialog(
-                  context: context,
-                  animType: AnimType.leftSlide,
-                  headerAnimationLoop: false,
-                  showCloseIcon: true,
-                  title: 'Setup Thành Công!',
-                  desc:
-                  'Tên Wifi: ${wifi.toString()}\nPassword: ${password.text}',
-                  btnOkOnPress: () {
-                  },
-                  btnOkIcon: Icons.check_circle,
-                  onDismissCallback: (type) {
-                  },
-                ).show();
+                _validateAndSend();
               },
               child: Text("Sent")),
-          // Flexible(
-          //   child: Center(
-          //     child: accessPoints.isEmpty
-          //         ? const Text("NO SCANNED RESULTS")
-          //         : ListView.builder(
-          //             itemCount: accessPoints.length,
-          //             itemBuilder: (context, i) {
-          //               return Text("${accessPoints[i].ssid}");
-          //             }),
-          //   ),
-          // ),
         ],
       ),
     );
@@ -191,11 +236,7 @@ class _Setup_WifiState extends State<Setup_Wifi> {
             ),
           ),
           TextButton(
-            onPressed: () {
-              setState(() {
-                _startListeningToScannedResults();
-              });
-            },
+            onPressed: () async => _startScan(context),
             child: Icon(Icons.change_circle_outlined),
           )
         ],

@@ -47,4 +47,3 @@ void connectToDevice(BluetoothDevice device) async {
   await device.connect();
 }
 
-
