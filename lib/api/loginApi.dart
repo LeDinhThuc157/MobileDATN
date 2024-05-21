@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../res/vaule.dart';
 import '../view/homePage.dart';
+import '../view/listRoom.dart';
 
 class ApiLogin {
   final Map<String, dynamic> userMap;
@@ -69,7 +70,7 @@ class ApiLogin {
       // Nếu sử dụng MaterialApp, có thể sử dụng Navigator.pushReplacement thay vì push
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HomePage()),
+        MaterialPageRoute(builder: (context) => ListRoom()),
       );
     }
   }

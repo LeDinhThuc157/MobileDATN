@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:smart_home/view/homePage.dart';
+import 'package:smart_home/view/listRoom.dart';
 
 
 class ContentApp extends StatefulWidget {
@@ -69,7 +70,7 @@ class _ContentAppState extends State<ContentApp> {
     return IndexedStack(
       index: chooseIndex,
       children: <Widget>[
-        HomePage(),
+        ListRoom(),
         // Graph(),
       ],
     );

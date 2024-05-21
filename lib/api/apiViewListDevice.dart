@@ -5,34 +5,31 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../res/vaule.dart';
 
-class ApiDeviceDetails{
+class ApiViewListDevice{
   final Map<String, dynamic> userMap;
   final int statusResponse;
   final String? error;
 
-  ApiDeviceDetails(this.userMap, this.statusResponse, this.error);
+  ApiViewListDevice(this.userMap, this.statusResponse, this.error);
 }
-Future<dynamic> RequestDevice(String device_id) async {
+Future<dynamic> Request() async {
   final dio = Dio();
 
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   String storedTokenKey = prefs.getString('tokenKey') ?? '';
   try{
     Response response = await dio.post(
-        addressReadDeviceDetails,
+      addressViewListDevice,
         options: Options(
           headers: {
             "Content-type": "application/json; charset=utf-8",
             "Authorization": "Bearer $storedTokenKey",
           },
         ),
-        data:jsonEncode({
-          "device_id": device_id
-        })
     );
     Map<String, dynamic> userMap = jsonDecode(response.toString());
     int statusResponse = response.statusCode!;
-    return ApiDeviceDetails(userMap, statusResponse, '');
+    return ApiViewListDevice(userMap, statusResponse, '');
   }catch(e){
     String error = e.toString();
     if(error == "FormatException: Unexpected character (at character 1)\nAccount not exist\n^\n"){
@@ -41,6 +38,6 @@ Future<dynamic> RequestDevice(String device_id) async {
     else{
       error = "Không có kết nỗi!";
     }
-    return ApiDeviceDetails({}, -1,error);
+    return ApiViewListDevice({}, -1,error);
   }
 }

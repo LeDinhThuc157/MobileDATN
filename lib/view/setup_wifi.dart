@@ -5,7 +5,12 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smart_home/view/homePage.dart';
 import 'package:wifi_scan/wifi_scan.dart';
+
+import '../api/apiUserAddDevice.dart';
+import 'listRoom.dart';
 
 class Setup_Wifi extends StatefulWidget {
   final BluetoothDevice? device;
@@ -71,7 +76,7 @@ class _Setup_WifiState extends State<Setup_Wifi> {
   }
 
   String _warningName = '', _warningPass = '';
-  void _validateAndSend() {
+  Future<void> _validateAndSend() async {
     String textN = name.text.trim();
     String textP = password.text.trim();
 
@@ -87,25 +92,53 @@ class _Setup_WifiState extends State<Setup_Wifi> {
      else {
       // Code to send the text
       setState(() {
-        _warningPass = ''; // Clear any previous warnings
+        _warningPass = '';
+        _warningName = '';// Clear any previous warnings
       });
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String storedUserName = prefs.getString('username') ?? '';
+      ApiUserAddDevice response =
+          await Request(widget.device!.remoteId.toString(), storedUserName);
+      Map<String, dynamic> userMap = response.userMap;
+      if(response.statusResponse == 200){
+        service();
+        AwesomeDialog(
+          context: context,
+          animType: AnimType.leftSlide,
+          headerAnimationLoop: false,
+          showCloseIcon: true,
+          title: 'Setup Thành Công!',
+          desc:
+          'Tên Wifi: ${name.text}\nPassword: ${password.text}',
+          btnOkOnPress: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => ListRoom()),
+            );
+          },
+          btnOkIcon: Icons.check_circle,
+          onDismissCallback: (type) {
+          },
+        ).show();
+      }else{
+        AwesomeDialog(
+          context: context,
+          animType: AnimType.leftSlide,
+          headerAnimationLoop: false,
+          showCloseIcon: true,
+          title: 'Error!',
+          desc:
+          '${response.error}',
+          btnOkOnPress: () {
+          },
+          btnOkIcon: Icons.error,
+          onDismissCallback: (type) {
+          },
+        ).show();
+      }
       // Add your code to send the text here
       print('Text sent: $_warningPass');
-      service();
-      AwesomeDialog(
-        context: context,
-        animType: AnimType.leftSlide,
-        headerAnimationLoop: false,
-        showCloseIcon: true,
-        title: 'Setup Thành Công!',
-        desc:
-        'Tên Wifi: ${name.text}\nPassword: ${password.text}',
-        btnOkOnPress: () {
-        },
-        btnOkIcon: Icons.check_circle,
-        onDismissCallback: (type) {
-        },
-      ).show();
+
     }
   }
 

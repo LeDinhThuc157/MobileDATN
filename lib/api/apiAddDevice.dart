@@ -13,7 +13,7 @@ class ApiAddDevice{
   ApiAddDevice(this.userMap, this.statusResponse, this.error);
 }
 
-Future<dynamic> AddDevice(String index, String aDevice) async {
+Future<dynamic> AddDevice(String index, String aDevice, String device_id) async {
   final dio = Dio();
 
   final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -30,6 +30,7 @@ Future<dynamic> AddDevice(String index, String aDevice) async {
         data:jsonEncode({
           "aDevice": aDevice,
           "index": index,
+          "device_id" : device_id
         })
     );
     Map<String, dynamic> userMap = jsonDecode(response.toString());

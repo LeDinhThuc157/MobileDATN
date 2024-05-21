@@ -1,4 +1,4 @@
-String ip = "https://draft.aithings.vn:6889";
+String ip = "http://192.168.1.17:8888";
 String address = "$ip/api/";
 String addressLogin = address + "LoginAPI/UsersLogin";
 String addressChangePass = address + "LoginAPI/UserChangePassword";
@@ -6,7 +6,10 @@ String addressReadDeviceDetails = address + "DataAPI/ReadDeviceDetails";
 String addressDeleteDevice = address + "DataAPI/DeleteDevice";
 String addressAddDevice = address + "DataAPI/AddDevice";
 String addressControlDevice = address + "DataAPI/ControlDevice";
-String addressQueryLog= address + "DataAPI/QueryLog";
+String addressQueryLog = address + "DataAPI/QueryLog";
+String addressUserAddDevice = address + "DataAPI/UserAddDevice";
+String addressViewListDevice= address + "DataAPI/ViewListDevice";
+
 
 
 

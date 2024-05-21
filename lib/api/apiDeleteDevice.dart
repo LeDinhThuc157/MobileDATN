@@ -12,7 +12,7 @@ class ApiDeleteDevice{
 
   ApiDeleteDevice(this.userMap, this.statusResponse, this.error);
 }
-Future<dynamic> DeleteDevice(String index, String rDevice) async {
+Future<dynamic> DeleteDevice(String index, String rDevice, String device_id) async {
   final dio = Dio();
 
   final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -29,6 +29,7 @@ Future<dynamic> DeleteDevice(String index, String rDevice) async {
         data:jsonEncode({
           "rDevice": rDevice,
           "index": index,
+          "device_id":device_id
         })
     );
     Map<String, dynamic> userMap = jsonDecode(response.toString());

@@ -1,27 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:smart_home/class/Light.dart';
 import 'package:smart_home/class/valueDeviceClass.dart';
+import 'package:smart_home/config/size_config.dart';
 import 'package:smart_home/provider/ValueProvider.dart';
+import 'package:smart_home/provider/home_screen_view_model.dart';
 import 'package:smart_home/view/device/listDoor.dart';
 import 'package:smart_home/view/device/listLight.dart';
 import 'package:smart_home/view/loginPage.dart';
 import 'package:smart_home/view/scan_device_bt.dart';
 import 'package:smart_home/view/viewHistory.dart';
-import 'package:smart_home/widget/boxDevice.dart';
 import '../api/apiChangePassword.dart';
-import '../class/Door.dart';
-import '../res/constants.dart';
-import '../widget/circularButton.dart';
-import 'device/controlDoor.dart';
-import 'device/controlLight.dart';
+import 'components/dark_container.dart';
 import 'device/listFant.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final String device_id;
+  const HomePage({super.key, required this.device_id});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -47,31 +43,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     // super.dispose();
   }
   String _savedValue = "";
-  @override
-  void initState() {
-    animationController = AnimationController(vsync: this,duration: Duration(milliseconds: 250));
-    degOneTranslationAnimation = TweenSequence([
-      TweenSequenceItem<double>(tween: Tween<double >(begin: 0.0,end: 1.2), weight: 75.0),
-      TweenSequenceItem<double>(tween: Tween<double>(begin: 1.2,end: 1.0), weight: 25.0),
-    ]).animate(animationController);
-    degTwoTranslationAnimation = TweenSequence([
-      TweenSequenceItem<double>(tween: Tween<double >(begin: 0.0,end: 1.4), weight: 55.0),
-      TweenSequenceItem<double>(tween: Tween<double>(begin: 1.4,end: 1.0), weight: 45.0),
-    ]).animate(animationController);
-    degThreeTranslationAnimation = TweenSequence([
-      TweenSequenceItem<double>(tween: Tween<double >(begin: 0.0,end: 1.75), weight: 35.0),
-      TweenSequenceItem<double>(tween: Tween<double>(begin: 1.75,end: 1.0), weight: 65.0),
-    ]).animate(animationController);
-    rotationAnimation = Tween<double>(begin: 180.0,end: 0.0).animate(CurvedAnimation(parent: animationController
-        , curve: Curves.easeOut));
-    super.initState();
-    animationController.addListener((){
-      setState(() {
-
-      });
-    });
-
-  }
 
 
   Future<String> getCurrentTime() async {
@@ -80,6 +51,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     String formattedTime = formatter.format(now);
     return formattedTime;
   }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -171,23 +143,19 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
         body: Consumer<ValueProvider>(
           builder: (context, provider, _){
+            ValueDeviceClass valueDeviceClass = provider.value.search(widget.device_id);
+            // bool isLightOn = false;
+            // if(valueDeviceClass.ls1 == 1) isLightOn = true;
+            // else isLightOn = false;
+            DateTime now = DateTime.now();
 
-            int countLight = 0, countDoor = 0, countFan = 0;
-            if(provider.value.ld1 == 1 && provider.value.ld2 == 1) countLight = 2;
-            else if(provider.value.ld1 != 1 && provider.value.ld2 == 1) countLight = 1;
-            else if(provider.value.ld1 == 1 && provider.value.ld2 != 1) countLight = 1;
-            else countLight = 0;
-
-            if(provider.value.dr1 == 1 && provider.value.dr2 == 1) countDoor = 2;
-            else if(provider.value.dr1 != 1 && provider.value.dr2 == 1) countDoor = 1;
-            else if(provider.value.dr2 != 1 && provider.value.dr1== 1) countDoor = 1;
-            else countDoor = 0;
-
-            if(provider.value.fn1 == 1 && provider.value.fn2 == 1) countFan = 2;
-            else if(provider.value.fn1 == 1 && provider.value.fn2 != 1) countFan = 1;
-            else if(provider.value.fn2 == 1 && provider.value.fn1 != 1) countFan = 1;
-            else countFan = 0;
-
+            // Xác định hình ảnh hiển thị dựa trên giờ hiện tại
+            String imagePath;
+            if (now.hour >= 6 && now.hour < 18) {
+              imagePath = 'assets/icons/sun.png';
+            } else {
+              imagePath = 'assets/icons/full-moon.png';
+            }
             return Container(
               width: size.width,
               height: size.height,
@@ -219,13 +187,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             ),
                             child: Column(
                               children: [
-                                Image.asset('assets/icons/sun.png',height: 77.2,width: 70,),
+                                Image.asset(imagePath,height: 77.2,width: 70,),
 
                                 Column(
                                   children: [
-                                    Text('${DateFormat('dd/MM/yyyy').format(provider.value.lastReceived)}'),
-                                    Text('${DateFormat('hh:mm').format(provider.value.lastReceived)}'),
-                                    Text('Status: ${provider.value.status}')
+                                    Text('${DateFormat('dd/MM/yyyy').format(valueDeviceClass.lastReceived)}'),
+                                    Text('${DateFormat('hh:mm').format(valueDeviceClass.lastReceived)}'),
+                                    Text('Status: ${valueDeviceClass.status}')
                                   ],
                                 ),
                               ],
@@ -252,8 +220,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 SizedBox(),
-                                Text("${provider.value.tem}℃",style: TextStyle(fontSize: 40),),
-                                Text('Độ ẩm: ${provider.value.hum}%'),
+                                Text("${valueDeviceClass.tem}℃",style: TextStyle(fontSize: 40),),
+                                Text('Độ ẩm: ${valueDeviceClass.hum}%'),
                                 SizedBox(),
                                 SizedBox()
                               ],
@@ -272,357 +240,114 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                           ),
                         ),
                       ),
-                      Center(
-                        child: Container(
-                          height: 80,
-                          width: 350,
-                          margin: EdgeInsets.only(bottom: 20),
-                          decoration: BoxDecoration(
-                            color: Colors.white, // Màu nền của container
-                            borderRadius: BorderRadius.circular(10), // Độ cong của góc
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5), // Màu và độ trong suốt của bóng đổ
-                                spreadRadius: 5, // Độ rộng mà bóng đổ lan ra
-                                blurRadius: 7, // Độ mờ của bóng đổ
-                                offset: Offset(0, 3), // Độ dịch chuyển của bóng đổ theo trục X và trục Y
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              GestureDetector(
-                                onTap: (){
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => ListLight(valueDeviceClass: provider.value,)));
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.all(10),
-                                  margin: EdgeInsets.only(left: 20),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white, // Màu nền của container
-                                    borderRadius: BorderRadius.circular(10), // Độ cong của góc
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.5), // Màu và độ trong suốt của bóng đổ
-                                        spreadRadius: 5, // Độ rộng mà bóng đổ lan ra
-                                        blurRadius: 7, // Độ mờ của bóng đổ
-                                        offset: Offset(0, 3), // Độ dịch chuyển của bóng đổ theo trục X và trục Y
-                                      ),
-                                    ],
-                                  ),
-                                  child:  Image.asset("assets/icons/lightbulb.png",height: 40,width: 40,),
-                                ),
-                              ),
-                              Container(
-                                child: Text(
-                                  "Light Connect",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 24
+                      Container(
+                        height: 500,
+                        child: ListView(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  width: 180,
+                                  child: Padding(
+                                    padding: EdgeInsets.all(10),
+                                    child: DarkContainer(
+                                      itsOn: provider.isLight1On,
+                                      switchButton: (){
+                                        provider.light1Switch(valueDeviceClass.device_id);
+                                      },
+                                      onTap: () {
+                                        // Navigator.of(context).pushNamed(SmartSpeaker.routeName);
+                                      },
+                                      iconAsset: 'assets/icons/light.svg',
+                                      device: 'Light',
+                                      deviceCount: 'device 1',
+                                      isAuto: provider.isAutoLight1,
+                                      switchAuto: () {
+                                        provider.light1Auto(valueDeviceClass.device_id);
+                                      },
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(right: 20),
-                                child: Text(
-                                  "${countLight}",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 28
+                                Container(
+                                  width: 180,
+                                  child: Padding(
+                                    padding: EdgeInsets.all(10),
+                                    child: DarkContainer(
+                                      itsOn: provider.isLight2On,
+                                      switchButton: (){
+                                        provider.light2Switch(valueDeviceClass.device_id);
+                                      },
+                                      onTap: () {
+                                        // Navigator.of(context).pushNamed(SmartSpeaker.routeName);
+                                      },
+                                      iconAsset: 'assets/icons/light.svg',
+                                      device: 'Light',
+                                      deviceCount: 'device 2',
+                                      isAuto: provider.isAutoLight2,
+                                      switchAuto: () {
+                                        provider.light2Auto(valueDeviceClass.device_id);
+                                    },
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  width: 180,
+                                  child: Padding(
+                                    padding: EdgeInsets.all(10),
+                                    child: DarkContainer(
+                                      itsOn: provider.isDoor1ON,
+                                      switchButton: (){
+                                        provider.door1Switch(valueDeviceClass.device_id);
+                                      },
+                                      onTap: () {
+                                        // Navigator.of(context).pushNamed(SmartSpeaker.routeName);
+                                      },
+                                      iconAsset: 'assets/icons/door.svg',
+                                      device: 'Door',
+                                      deviceCount: 'device 1',
+                                      isAuto: provider.isAutoDoor1,
+                                      switchAuto: () {
+                                        provider.door1Auto(valueDeviceClass.device_id);
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  width: 180,
+                                  child: Padding(
+                                    padding: EdgeInsets.all(10),
+                                    child: DarkContainer(
+                                      itsOn: provider.isDoor2ON,
+                                      switchButton: (){
+                                        provider.door2Switch(valueDeviceClass.device_id);
+                                      },
+                                      onTap: () {
+                                        // Navigator.of(context).pushNamed(SmartSpeaker.routeName);
+                                      },
+                                      iconAsset: 'assets/icons/door.svg',
+                                      device: 'Door',
+                                      deviceCount: 'device 2',
+                                      isAuto: provider.isAutoDoor2,
+                                      switchAuto: () {
+                                        provider.door2Auto(valueDeviceClass.device_id);
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                      Center(
-                        child: Container(
-                          height: 80,
-                          width: 350,
-                          margin: EdgeInsets.only(bottom: 20),
-                          decoration: BoxDecoration(
-                            color: Colors.white, // Màu nền của container
-                            borderRadius: BorderRadius.circular(10), // Độ cong của góc
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5), // Màu và độ trong suốt của bóng đổ
-                                spreadRadius: 5, // Độ rộng mà bóng đổ lan ra
-                                blurRadius: 7, // Độ mờ của bóng đổ
-                                offset: Offset(0, 3), // Độ dịch chuyển của bóng đổ theo trục X và trục Y
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              GestureDetector(
-                                onTap: (){
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => ListDoor(valueDeviceClass: provider.value,)));
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.all(10),
-                                  margin: EdgeInsets.only(left: 20),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white, // Màu nền của container
-                                    borderRadius: BorderRadius.circular(10), // Độ cong của góc
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.5), // Màu và độ trong suốt của bóng đổ
-                                        spreadRadius: 5, // Độ rộng mà bóng đổ lan ra
-                                        blurRadius: 7, // Độ mờ của bóng đổ
-                                        offset: Offset(0, 3), // Độ dịch chuyển của bóng đổ theo trục X và trục Y
-                                      ),
-                                    ],
-                                  ),
-                                  child:  Image.asset("assets/icons/doori.png",height: 40,width: 40,),
-                                ),
-                              ),
-                              Container(
-                                child: Text(
-                                  "Door Connect",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 24
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(right: 20),
-                                child: Text(
-                                  "${countDoor}",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 28
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Center(
-                        child: Container(
-                          height: 80,
-                          width: 350,
-                          margin: EdgeInsets.only(bottom: 20),
-                          decoration: BoxDecoration(
-                            color: Colors.white, // Màu nền của container
-                            borderRadius: BorderRadius.circular(10), // Độ cong của góc
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5), // Màu và độ trong suốt của bóng đổ
-                                spreadRadius: 5, // Độ rộng mà bóng đổ lan ra
-                                blurRadius: 7, // Độ mờ của bóng đổ
-                                offset: Offset(0, 3), // Độ dịch chuyển của bóng đổ theo trục X và trục Y
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              GestureDetector(
-                                onTap: (){
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => ListFan(valueDeviceClass: provider.value,)));
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.all(10),
-                                  margin: EdgeInsets.only(left: 20),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white, // Màu nền của container
-                                    borderRadius: BorderRadius.circular(10), // Độ cong của góc
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.5), // Màu và độ trong suốt của bóng đổ
-                                        spreadRadius: 5, // Độ rộng mà bóng đổ lan ra
-                                        blurRadius: 7, // Độ mờ của bóng đổ
-                                        offset: Offset(0, 3), // Độ dịch chuyển của bóng đổ theo trục X và trục Y
-                                      ),
-                                    ],
-                                  ),
-                                  child:  Image.asset("assets/icons/fan.png",height: 40,width: 40,),
-                                ),
-                              ),
-                              Container(
-                                child: Text(
-                                  "Fan Connect",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 24
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(right: 20),
-                                child: Text(
-                                  "${countFan}",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 28
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      // Center(
-                      //   child: Container(
-                      //     height: 80,
-                      //     width: 350,
-                      //     decoration: BoxDecoration(
-                      //       color: Colors.white, // Màu nền của container
-                      //       borderRadius: BorderRadius.circular(10), // Độ cong của góc
-                      //       boxShadow: [
-                      //         BoxShadow(
-                      //           color: Colors.grey.withOpacity(0.5), // Màu và độ trong suốt của bóng đổ
-                      //           spreadRadius: 5, // Độ rộng mà bóng đổ lan ra
-                      //           blurRadius: 7, // Độ mờ của bóng đổ
-                      //           offset: Offset(0, 3), // Độ dịch chuyển của bóng đổ theo trục X và trục Y
-                      //         ),
-                      //       ],
-                      //     ),
-                      //     child: Row(
-                      //       crossAxisAlignment: CrossAxisAlignment.center,
-                      //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      //       children: [
-                      //         GestureDetector(
-                      //           onTap: (){
-                      //
-                      //           },
-                      //           child: Container(
-                      //             padding: EdgeInsets.all(10),
-                      //             margin: EdgeInsets.only(left: 20),
-                      //             decoration: BoxDecoration(
-                      //               color: Colors.white, // Màu nền của container
-                      //               borderRadius: BorderRadius.circular(10), // Độ cong của góc
-                      //               boxShadow: [
-                      //                 BoxShadow(
-                      //                   color: Colors.grey.withOpacity(0.5), // Màu và độ trong suốt của bóng đổ
-                      //                   spreadRadius: 5, // Độ rộng mà bóng đổ lan ra
-                      //                   blurRadius: 7, // Độ mờ của bóng đổ
-                      //                   offset: Offset(0, 3), // Độ dịch chuyển của bóng đổ theo trục X và trục Y
-                      //                 ),
-                      //               ],
-                      //             ),
-                      //             child:  Image.asset("assets/icons/lightbulb.png",height: 40,width: 40,),
-                      //           ),
-                      //         ),
-                      //         Container(
-                      //           child: Text(
-                      //             "Light Connect",
-                      //             style: TextStyle(
-                      //                 fontWeight: FontWeight.w600,
-                      //                 fontSize: 24
-                      //             ),
-                      //           ),
-                      //         ),
-                      //         Container(
-                      //           margin: EdgeInsets.only(right: 20),
-                      //           child: Text(
-                      //             "${countLight}",
-                      //             style: TextStyle(
-                      //                 fontWeight: FontWeight.bold,
-                      //                 fontSize: 28
-                      //             ),
-                      //           ),
-                      //         ),
-                      //       ],
-                      //     ),
-                      //   ),
-                      // ),
 
                     ],
                   ),
-
-                  Positioned(
-                    bottom: 30,
-                    right: 10,
-                    child: Stack(
-                      alignment: Alignment.bottomRight,
-                      children: [
-                        IgnorePointer(
-                          child: Container(
-                            margin: EdgeInsets.all(5),
-                            color: Colors.transparent,
-                            height: 150.0,
-                            width: 200.0,
-                          ),
-                        ),
-                        Transform.translate(
-                          offset: Offset.fromDirection(getRadiansFromDegree(180),degTwoTranslationAnimation.value * 80),
-                          child: Transform(
-                            transform: Matrix4.rotationZ(getRadiansFromDegree(rotationAnimation.value))..scale(degTwoTranslationAnimation.value),
-                            alignment: Alignment.center,
-                            child: TextButton(
-                                onPressed: () async {
-                                  print('Second button');
-                                  Navigator.push(
-                                      context, MaterialPageRoute(builder: (context) => ScanBT()));
-                                },
-                                child: Container(
-                                  height: 50,
-                                  width: 50,
-                                  decoration: BoxDecoration(
-                                    color: Colors.black,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: Colors.black,
-                                      width: 1.0,
-                                    ),
-                                  ),
-                                  child: ClipOval(
-                                    child: Icon(
-                                      Icons.add,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                )
-
-
-
-                            ),
-                          ),
-                        ),
-                        Transform.translate(
-                          offset: Offset.fromDirection(getRadiansFromDegree(180),degThreeTranslationAnimation.value * 150),
-                          child: Transform(
-                            transform: Matrix4.rotationZ(getRadiansFromDegree(rotationAnimation.value))..scale(degThreeTranslationAnimation.value),
-                            alignment: Alignment.center,
-                            child: TextButton(
-                                onPressed: () async {
-                                  Navigator.push(
-                                      context, MaterialPageRoute(builder: (context) => ViewHistory()));
-                                },
-                                child: Container(
-                                  height: 50,
-                                  width: 50,
-                                  decoration: BoxDecoration(
-                                    color: Colors.black,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: Colors.black,
-                                      width: 1.0,
-                                    ),
-                                  ),
-                                  child: ClipOval(
-                                    child: Icon(
-                                      Icons.question_mark_rounded,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                )
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  //Lamp,
                 ],
               ),
             );
@@ -631,119 +356,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
-            if (animationController.isCompleted) {
-              animationController.reverse();
-            } else {
-              animationController.forward();
-            }
+
           },
-          child: Icon(Icons.settings),
+          child: Icon(Icons.add),
         ),
       ),
     );
   }
 
-  // Widget BoxDevice(bool fdevice1, bool fdevice2, String vdevice1, String vdevice2, String ndevice1, String ndevice2, String image, Widget page1, Widget page2) {
-  //   return Column(
-  //     mainAxisAlignment: MainAxisAlignment.center,
-  //     children: [
-  //       fdevice1 ? Container(
-  //         margin: EdgeInsets.only(top: 10,bottom: 10,right: 25,left: 25),
-  //         decoration: BoxDecoration(
-  //           color: Colors.white, // Màu nền của container
-  //           borderRadius: BorderRadius.circular(10), // Độ cong của góc
-  //           boxShadow: [
-  //             BoxShadow(
-  //               color: Colors.grey.withOpacity(0.5), // Màu và độ trong suốt của bóng đổ
-  //               spreadRadius: 5, // Độ rộng mà bóng đổ lan ra
-  //               blurRadius: 7, // Độ mờ của bóng đổ
-  //               offset: Offset(0, 3), // Độ dịch chuyển của bóng đổ theo trục X và trục Y
-  //             ),
-  //           ],
-  //         ),
-  //         child: GestureDetector (
-  //             onTap: (){
-  //               Navigator.push(
-  //                   context, MaterialPageRoute(builder: (context) => page1));
-  //             },
-  //             child: Row(
-  //               mainAxisAlignment: MainAxisAlignment.start,
-  //               children: [
-  //                 Container(
-  //                   child: Image.asset(image,height: 40,width: 40,),
-  //                 ),
-  //                 SizedBox(),
-  //                 Container(
-  //                   width: 230,
-  //                   child: Column(
-  //                     children: [
-  //                       Text(ndevice1),
-  //                       Text("Status: ${vdevice1}")
-  //                     ],
-  //                   ),
-  //                 ),
-  //                 Container()
-  //               ],
-  //             )
-  //         ),
-  //       ) : SizedBox(),
-  //       fdevice2 ? Container(
-  //         margin: EdgeInsets.only(top: 10,bottom: 10,right: 25,left: 25),
-  //         decoration: BoxDecoration(
-  //           color: Colors.white, // Màu nền của container
-  //           borderRadius: BorderRadius.circular(10), // Độ cong của góc
-  //           boxShadow: [
-  //             BoxShadow(
-  //               color: Colors.grey.withOpacity(0.5), // Màu và độ trong suốt của bóng đổ
-  //               spreadRadius: 5, // Độ rộng mà bóng đổ lan ra
-  //               blurRadius: 7, // Độ mờ của bóng đổ
-  //               offset: Offset(0, 3), // Độ dịch chuyển của bóng đổ theo trục X và trục Y
-  //             ),
-  //           ],
-  //         ),
-  //         child: GestureDetector (
-  //             onTap: (){
-  //               Navigator.push(
-  //                   context, MaterialPageRoute(builder: (context) => page2));
-  //             },
-  //             child: Row(
-  //               children: [
-  //                 Container(
-  //                   child: Image.asset(image,height: 40,width: 40,),
-  //                 ),
-  //                 Container(
-  //                   width: 230,
-  //                   child: Column(
-  //                     children: [
-  //                       Text(ndevice2),
-  //                       Text("Status: ${vdevice2}")
-  //                     ],
-  //                   ),
-  //                 ),
-  //                 Container()
-  //               ],
-  //             )
-  //         ),
-  //       ) : SizedBox(),
-  //       fdevice1 && fdevice2 ? SizedBox() : Container(
-  //         margin: EdgeInsets.only(top: 10,bottom: 10),
-  //         width: 100,
-  //         decoration: BoxDecoration(
-  //           color: seekBarLightColor,
-  //           borderRadius: BorderRadius.all(
-  //             Radius.circular(10),
-  //           ),
-  //         ),
-  //         child: TextButton(
-  //             onPressed: (){
-  //             },
-  //             child: Text("Add",style: TextStyle(
-  //                 fontSize: 18,
-  //                 fontWeight: FontWeight.bold
-  //             ),)
-  //         ),
-  //       )
-  //     ],
-  //   );
-  // }
 }

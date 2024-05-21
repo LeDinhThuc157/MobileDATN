@@ -1,6 +1,7 @@
 import '../api/apiRDeviceDetails.dart';
 
 class ValueDeviceClass{
+  late String device_id;
   late bool status;
   late DateTime lastReceived;
   late String deviceName;
@@ -29,6 +30,33 @@ class ValueDeviceClass{
   late double ls2; // Đèn 2 đóng hay mở
 
   late double bs; // Chế độ còi
+  ValueDeviceClass(){
+    device_id = '';
+    status = false;
+    lastReceived = DateTime.now();
+    deviceName = '';
+    version = '';
+    tem = -1;
+    hum = -1;
+    vMq2 = -1;
+    dr1 = -1;
+    dr2 = -1;
+    dm1 = -1;
+    dm2 = -1;
+    ds1 = -1;
+    ds2 = -1;
+    fn1 = -1;
+    fn2 = -1;
+    fs1 = -1;
+    fs2 = -1;
+    ld1 = -1;
+    ld2 = -1;
+    lm1 = -1;
+    lm2 = -1;
+    ls1 = -1;
+    ls2 = -1;
+    bs = -1;
+  }
 }
 
 // Future<dynamic> RequestValue() async {

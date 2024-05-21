@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../api/loginApi.dart';
 import '../res/constants.dart';
 import 'homePage.dart';
+import 'listRoom.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -63,7 +64,7 @@ class _LoginPageState extends State<LoginPage> {
       await prefs.setString("username", userMap["username"]);
 
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => HomePage()));
+          context, MaterialPageRoute(builder: (context) => ListRoom()));
     } else {
       showDialog(
           context: context,

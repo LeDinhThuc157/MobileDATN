@@ -12,7 +12,7 @@ class ApiControlDevice{
 
   ApiControlDevice(this.userMap, this.statusResponse, this.error);
 }
-Future<dynamic> ControlDevice(String index, String cDevice, String mode) async {
+Future<dynamic> ControlDevice(String index, String cDevice, String mode, String device_id) async {
   final dio = Dio();
 
   final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -29,7 +29,8 @@ Future<dynamic> ControlDevice(String index, String cDevice, String mode) async {
         data:jsonEncode({
           "cDevice": cDevice,
           "index": index,
-          "mode" : mode
+          "mode" : mode,
+          "device_id" : device_id
         })
     );
     Map<String, dynamic> userMap = jsonDecode(response.toString());
