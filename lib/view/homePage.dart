@@ -6,6 +6,7 @@ import 'package:smart_home/class/valueDeviceClass.dart';
 import 'package:smart_home/config/size_config.dart';
 import 'package:smart_home/provider/ValueProvider.dart';
 import 'package:smart_home/provider/home_screen_view_model.dart';
+import 'package:smart_home/view/components/fan_container.dart';
 import 'package:smart_home/view/device/listDoor.dart';
 import 'package:smart_home/view/device/listLight.dart';
 import 'package:smart_home/view/loginPage.dart';
@@ -230,15 +231,130 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                           SizedBox(),
                         ],
                       ),
-                      Container(
-                        margin: EdgeInsets.only(left: 20, top: 30,bottom: 20),
-                        child: Text(
-                          "Control Device",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            margin: EdgeInsets.only(left: 20, top: 30,bottom: 20),
+                            child: Text(
+                              "Control Device",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18
+                              ),
+                            ),
                           ),
-                        ),
+                          Container(
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                showDialog(context: context,
+                                    builder: (BuildContext context) {
+                                      String? selectedValue;
+                                      String? addDevice;
+                                  String Value = '';
+                                  TextEditingController coutD = TextEditingController();
+                                  return AlertDialog(
+                                    title: Text('Change Password'),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: <Widget>[
+                                    DropdownButton<String>(
+                                    value: selectedValue,
+                                      items: <String>['Light', 'Door', 'Fan'].map<DropdownMenuItem<String>>((String value) {
+                                        return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: Text(
+                                            value,
+                                            style: TextStyle(fontSize: 30),
+                                          ),
+                                        );
+                                      }).toList(),
+                                      onChanged: (String? newValue) {
+                                        setState(() {
+                                          selectedValue = newValue;
+                                          if (newValue == 'Light') {
+                                            addDevice = 'alight';
+                                          } else if (newValue == 'Door') {
+                                            addDevice = 'adoor';
+                                          } else if (newValue == 'Fan') {
+                                            addDevice = 'afan';
+                                          }
+                                        });
+                                      },
+                                    ),
+                                        TextField(
+                                          controller: coutD,
+                                          decoration: InputDecoration(labelText: 'Enter device: 1 or 2'),
+                                          obscureText: true, // Ẩn mật khẩu nhập vào
+                                        ),
+                                      ],
+                                    ),
+                                    actions: <Widget>[
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text('Cancel'),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () async {
+                                          print("Device: ${addDevice} + ${coutD.text}");
+                                        },
+                                        child: Text('Save'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                                );
+                              },
+                              child: Text('Add'),
+                            ),
+                          ),
+                          Container(
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                showDialog(context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text('Change Password'),
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: <Widget>[
+                                          TextField(
+                                            controller: oldpassword,
+                                            decoration: InputDecoration(labelText: 'Enter Old Password'),
+                                            obscureText: true, // Ẩn mật khẩu nhập vào
+                                          ),
+                                          TextField(
+                                            controller: newpassword,
+                                            decoration: InputDecoration(labelText: 'Enter New Password'),
+                                            obscureText: true, // Ẩn mật khẩu nhập vào
+                                          ),
+                                        ],
+                                      ),
+                                      actions: <Widget>[
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Text('Cancel'),
+                                        ),
+                                        ElevatedButton(
+                                          onPressed: () async {
+
+                                          },
+                                          child: Text('Save'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                              child: Text('Delete'),
+                            ),
+                          ),
+                          SizedBox()
+                        ],
                       ),
                       Container(
                         height: 500,
@@ -342,6 +458,45 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                 ),
                               ],
                             ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  width: 180,
+                                  child: Padding(
+                                    padding: EdgeInsets.all(10),
+                                    child: FanContainer(
+                                      iconAsset: 'assets/icons/fan1.svg',
+                                      onTap: () {  },
+                                      device: 'Fan',
+                                      deviceCount: 'device 1',
+                                      itsOn: provider.isFan1On,
+                                      switchButton: (newvalue) {
+                                        provider.fan1Switch(valueDeviceClass.device_id, newvalue);
+                                      },
+                                      value: provider.valueFan1,
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  width: 180,
+                                  child: Padding(
+                                    padding: EdgeInsets.all(10),
+                                    child: FanContainer(
+                                      iconAsset: 'assets/icons/fan1.svg',
+                                      onTap: () {  },
+                                      device: 'Fan',
+                                      deviceCount: 'device 2',
+                                      itsOn: provider.isFan2On,
+                                      switchButton: (value) {
+                                        provider.fan2Switch(valueDeviceClass.device_id, value);
+                                      },
+                                      value: provider.valueFan2,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),
@@ -353,12 +508,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             );
 
           },
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () async {
-
-          },
-          child: Icon(Icons.add),
         ),
       ),
     );

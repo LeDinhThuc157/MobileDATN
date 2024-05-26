@@ -13,15 +13,15 @@ class ValueProvider extends ChangeNotifier {
   bool isDoor1ON = false;
   bool isDoor2ON = false;
 
-  // bool isLight1Fav = false;
-  // bool isLight2Fav = false;
-  // bool isDoor1Fav = false;
-  // bool isDoor2Fav = false;
-
   bool isAutoLight1 = false;
   bool isAutoLight2 = false;
   bool isAutoDoor1 = false;
   bool isAutoDoor2 = false;
+
+  bool isFan1On = false;
+  bool isFan2On = false;
+  double valueFan1 = 0.0;
+  double valueFan2 = 0.0;
 
   ListDevice get value => _valueL;
   ValueProvider() {
@@ -70,7 +70,7 @@ class ValueProvider extends ChangeNotifier {
       value.ls2 = userMap['lastData']['ls2'] == null ? 0 : userMap['lastData']['ls2'];
       value.bs = userMap['lastData']['bs'] == null ? 0 : userMap['lastData']['bs'];
       valueL.listDevice.add(value);
-      setValue(value.ls1,value.ls2,value.ds1,value.ds2,value.dm1,value.dm2,value.lm1,value.lm2);
+      setValue(value.ls1,value.ls2,value.ds1,value.ds2,value.dm1,value.dm2,value.lm1,value.lm2, value.fs1, value.fs2);
     }
     _valueL = valueL;
     notifyListeners();
@@ -83,7 +83,7 @@ class ValueProvider extends ChangeNotifier {
     });
   }
 
-  void setValue(double ls1, double ls2, double ds1, double ds2, double dm1, double dm2, double lm1, double lm2){
+  void setValue(double ls1, double ls2, double ds1, double ds2, double dm1, double dm2, double lm1, double lm2, double fs1, double fs2){
     if(ls1 == 1) isLight1On = true;
     if(ls1 == 0) isLight1On = false;
     if(ls2 == 1) isLight2On = true;
@@ -104,6 +104,19 @@ class ValueProvider extends ChangeNotifier {
     if(dm2 == 1) isAutoDoor2 = true;
     if(dm2 == 0) isAutoDoor2 = false;
 
+    if(fs1 != 0){
+      isFan1On = true;
+    }else{
+      isFan1On = false;
+    }
+    valueFan1 = fs1;
+
+    if(fs2 != 0){
+      isFan2On = true;
+    }else{
+      isFan2On = false;
+    }
+    valueFan2 = fs2;
   }
 
   Future<void> light1Auto(String id) async {
@@ -222,6 +235,7 @@ class ValueProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
+
   Future<void> light1Switch(String id) async {
     isLight1On = !isLight1On;
     if(isLight1On){
@@ -301,4 +315,28 @@ class ValueProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> fan1Switch(String id, double value) async {
+    if(value == 0){
+      isFan1On = false;
+      ApiControlDevice control = await ControlDevice("1", "cfan", "0", id);
+
+    } else{
+      isFan1On = true;
+      ApiControlDevice control = await ControlDevice("1", "cfan", value.toInt().toString(), id);
+    }
+    valueFan1 = value;
+    notifyListeners();
+  }
+  Future<void> fan2Switch(String id, double value) async {
+    if(value == 0){
+      isFan2On = false;
+      ApiControlDevice control = await ControlDevice("2", "cfan", "0", id);
+
+    } else{
+      isFan2On = true;
+      ApiControlDevice control = await ControlDevice("2", "cfan", value.toInt().toString(), id);
+    }
+    valueFan2 = value;
+    notifyListeners();
+  }
 }
