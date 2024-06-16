@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smart_home/api/apiAddDevice.dart';
+import 'package:smart_home/api/apiDeleteDevice.dart';
 import 'package:smart_home/class/valueDeviceClass.dart';
 import 'package:smart_home/config/size_config.dart';
 import 'package:smart_home/provider/ValueProvider.dart';
@@ -13,6 +15,7 @@ import 'package:smart_home/view/loginPage.dart';
 import 'package:smart_home/view/scan_device_bt.dart';
 import 'package:smart_home/view/viewHistory.dart';
 import '../api/apiChangePassword.dart';
+import 'components/add_container.dart';
 import 'components/dark_container.dart';
 import 'device/listFant.dart';
 
@@ -251,42 +254,63 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                     builder: (BuildContext context) {
                                       String? selectedValue;
                                       String? addDevice;
-                                  String Value = '';
-                                  TextEditingController coutD = TextEditingController();
+                                      String? stt;
                                   return AlertDialog(
-                                    title: Text('Change Password'),
+                                    title: Text('Add Device'),
                                     content: Column(
                                       mainAxisSize: MainAxisSize.min,
                                       children: <Widget>[
-                                    DropdownButton<String>(
-                                    value: selectedValue,
-                                      items: <String>['Light', 'Door', 'Fan'].map<DropdownMenuItem<String>>((String value) {
-                                        return DropdownMenuItem<String>(
-                                          value: value,
-                                          child: Text(
-                                            value,
-                                            style: TextStyle(fontSize: 30),
+                                        Padding(
+                                            padding: EdgeInsets.all(10),
+                                          child: DropdownMenu<String>(
+                                            width: 200,
+                                            requestFocusOnTap: false,
+                                            menuHeight: 200,
+                                            label: const Text('Choose Device'),
+                                            onSelected: (value) {
+                                              setState(() {
+                                                selectedValue = value!;
+                                                switch (selectedValue) {
+                                                  case 'Light':
+                                                    addDevice = 'alight';
+                                                    break;
+                                                  case 'Door':
+                                                    addDevice = 'adoor';
+                                                    break;
+                                                  case 'Fan':
+                                                    addDevice = 'afan';
+                                                    break;
+                                                }
+                                              });
+                                            },
+                                            dropdownMenuEntries: ['Light', 'Door', 'Fan'].map((e) {
+                                              return DropdownMenuEntry<String>(
+                                                label: e,
+                                                value: e,
+                                              );
+                                            }).toList(),
                                           ),
-                                        );
-                                      }).toList(),
-                                      onChanged: (String? newValue) {
-                                        setState(() {
-                                          selectedValue = newValue;
-                                          if (newValue == 'Light') {
-                                            addDevice = 'alight';
-                                          } else if (newValue == 'Door') {
-                                            addDevice = 'adoor';
-                                          } else if (newValue == 'Fan') {
-                                            addDevice = 'afan';
-                                          }
-                                        });
-                                      },
-                                    ),
-                                        TextField(
-                                          controller: coutD,
-                                          decoration: InputDecoration(labelText: 'Enter device: 1 or 2'),
-                                          obscureText: true, // Ẩn mật khẩu nhập vào
                                         ),
+                                        Padding(
+                                            padding:  EdgeInsets.all(10),
+                                          child: DropdownMenu<String>(
+                                            width: 200,
+                                            requestFocusOnTap: false,
+                                            menuHeight: 200,
+                                            label: const Text('Choose Value'),
+                                            onSelected: (value) {
+                                              setState(() {
+                                                stt = value!;
+                                              });
+                                            },
+                                            dropdownMenuEntries: ['1', '2'].map((e) {
+                                              return DropdownMenuEntry<String>(
+                                                label: e,
+                                                value: e,
+                                              );
+                                            }).toList(),
+                                          ),
+                                        )
                                       ],
                                     ),
                                     actions: <Widget>[
@@ -298,7 +322,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                       ),
                                       ElevatedButton(
                                         onPressed: () async {
-                                          print("Device: ${addDevice} + ${coutD.text}");
+                                          ApiAddDevice add = await AddDevice(stt!, addDevice! , valueDeviceClass.device_id);
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              backgroundColor: Colors.green, // Màu xanh cho thành công
+                                              content: Text('Add successfully!'),
+                                            ),
+                                          );
+                                          print("Device: ${addDevice} + ${stt}");
                                         },
                                         child: Text('Save'),
                                       ),
@@ -315,21 +346,65 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                               onPressed: () async {
                                 showDialog(context: context,
                                   builder: (BuildContext context) {
+                                    String? selectedValue;
+                                    String? dDevice;
+                                    String? stt;
                                     return AlertDialog(
-                                      title: Text('Change Password'),
+                                      title: Text('Delete Device'),
                                       content: Column(
                                         mainAxisSize: MainAxisSize.min,
                                         children: <Widget>[
-                                          TextField(
-                                            controller: oldpassword,
-                                            decoration: InputDecoration(labelText: 'Enter Old Password'),
-                                            obscureText: true, // Ẩn mật khẩu nhập vào
+                                          Padding(
+                                            padding: EdgeInsets.all(10),
+                                            child: DropdownMenu<String>(
+                                              width: 200,
+                                              requestFocusOnTap: false,
+                                              menuHeight: 200,
+                                              label: const Text('Choose Device'),
+                                              onSelected: (value) {
+                                                setState(() {
+                                                  selectedValue = value!;
+                                                  switch (selectedValue) {
+                                                    case 'Light':
+                                                      dDevice = 'rlight';
+                                                      break;
+                                                    case 'Door':
+                                                      dDevice = 'rdoor';
+                                                      break;
+                                                    case 'Fan':
+                                                      dDevice = 'rfan';
+                                                      break;
+                                                  }
+                                                });
+                                              },
+                                              dropdownMenuEntries: ['Light', 'Door', 'Fan'].map((e) {
+                                                return DropdownMenuEntry<String>(
+                                                  label: e,
+                                                  value: e,
+                                                );
+                                              }).toList(),
+                                            ),
                                           ),
-                                          TextField(
-                                            controller: newpassword,
-                                            decoration: InputDecoration(labelText: 'Enter New Password'),
-                                            obscureText: true, // Ẩn mật khẩu nhập vào
-                                          ),
+                                          Padding(
+                                            padding:  EdgeInsets.all(10),
+                                            child: DropdownMenu<String>(
+                                              width: 200,
+                                              requestFocusOnTap: false,
+                                              menuHeight: 200,
+                                              label: const Text('Choose Value'),
+                                              onSelected: (value) {
+                                                setState(() {
+                                                  stt = value!;
+                                                });
+                                              },
+                                              dropdownMenuEntries: ['1', '2'].map((e) {
+                                                return DropdownMenuEntry<String>(
+                                                  label: e,
+                                                  value: e,
+                                                );
+                                              }).toList(),
+                                            ),
+                                          )
                                         ],
                                       ),
                                       actions: <Widget>[
@@ -341,7 +416,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                         ),
                                         ElevatedButton(
                                           onPressed: () async {
-
+                                            ApiDeleteDevice add = await DeleteDevice(stt!, dDevice!, valueDeviceClass.device_id);
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                backgroundColor: Colors.green, // Màu xanh cho thành công
+                                                content: Text('Remove successfully!'),
+                                              ),
+                                            );
                                           },
                                           child: Text('Save'),
                                         ),
@@ -363,6 +444,17 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
+                                valueDeviceClass.ld1 == 0 ?
+                                Container(
+                                  width: 180,
+                                  child: Padding(
+                                    padding: EdgeInsets.all(10),
+                                    child: AddContainer(
+                                      onTap: () {  },
+                                      device: '',
+                                    ),
+                                  ),
+                                ) :
                                 Container(
                                   width: 180,
                                   child: Padding(
@@ -385,7 +477,16 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                     ),
                                   ),
                                 ),
+                                valueDeviceClass.ld2 == 0 ?
                                 Container(
+                                    width: 180,
+                                    child: Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: AddContainer(
+                                        onTap: () {  },
+                                        device: '',
+                                      ),
+                                    ) ): Container(
                                   width: 180,
                                   child: Padding(
                                     padding: EdgeInsets.all(10),
@@ -412,7 +513,16 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
+                                valueDeviceClass.dr1 == 0 ?
                                 Container(
+                                    width: 180,
+                                    child: Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: AddContainer(
+                                        onTap: () {  },
+                                        device: '',
+                                      ),
+                                    ) ) : Container(
                                   width: 180,
                                   child: Padding(
                                     padding: EdgeInsets.all(10),
@@ -434,7 +544,16 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                     ),
                                   ),
                                 ),
+                                valueDeviceClass.dr2 == 0 ?
                                 Container(
+                                    width: 180,
+                                    child: Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: AddContainer(
+                                        onTap: () {  },
+                                        device: '',
+                                      ),
+                                    ) ) : Container(
                                   width: 180,
                                   child: Padding(
                                     padding: EdgeInsets.all(10),
@@ -461,7 +580,16 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
+                                valueDeviceClass.fn1 == 0 ?
                                 Container(
+                                    width: 180,
+                                    child: Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: AddContainer(
+                                        onTap: () {  },
+                                        device: '',
+                                      ),
+                                    ) ) : Container(
                                   width: 180,
                                   child: Padding(
                                     padding: EdgeInsets.all(10),
@@ -478,7 +606,16 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                     ),
                                   ),
                                 ),
+                                valueDeviceClass.fn2 == 0 ?
                                 Container(
+                                    width: 180,
+                                    child: Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: AddContainer(
+                                        onTap: () {  },
+                                        device: '',
+                                      ),
+                                    ) ) : Container(
                                   width: 180,
                                   child: Padding(
                                     padding: EdgeInsets.all(10),

@@ -27,9 +27,20 @@ class _ScanBTState extends State<ScanBT> {
       body: Column(
         children: [
           Container(
-            color: Colors.red,
             height: 40,
             width: 100,
+            decoration: BoxDecoration(
+              color: Colors.white, // Màu nền của container
+              borderRadius: BorderRadius.circular(10), // Độ cong của góc
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5), // Màu và độ trong suốt của bóng đổ
+                  spreadRadius: 5, // Độ rộng mà bóng đổ lan ra
+                  blurRadius: 7, // Độ mờ của bóng đổ
+                  offset: Offset(0, 3), // Độ dịch chuyển của bóng đổ theo trục X và trục Y
+                ),
+              ],
+            ),
             child: TextButton(
               onPressed: () async {
                 Bluetooth bluetooth = await On_Off();

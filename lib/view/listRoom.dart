@@ -300,14 +300,12 @@ class _ListRoomState extends State<ListRoom> with SingleTickerProviderStateMixin
           },
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () async {
-            if (animationController.isCompleted) {
-              animationController.reverse();
-            } else {
-              animationController.forward();
-            }
+          onPressed: () {
+            print("Add");
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => ScanBT()));
           },
-          child: Icon(Icons.settings),
+          child: Icon(Icons.add),
         ),
       ),
     );
