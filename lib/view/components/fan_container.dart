@@ -8,9 +8,9 @@ class FanContainer extends StatefulWidget {
   final String device;
   final String deviceCount;
   final bool itsOn;
-  double? value;
-  // final VoidCallback switchButton;
-  final Function(double)? switchButton;
+  final double? value;
+  final Function(double)? onValueChanged;
+  // final Function(double)? switchButton;
 
   FanContainer({
     Key? key,
@@ -19,8 +19,7 @@ class FanContainer extends StatefulWidget {
     required this.device,
     required this.deviceCount,
     required this.itsOn,
-    required this.switchButton,
-    this.value
+    required this.value, required this.onValueChanged
   }) : super(key: key);
 
   @override
@@ -29,6 +28,18 @@ class FanContainer extends StatefulWidget {
 
 class _FanContainerState extends State<FanContainer> {
 
+  double _currentValue = 0.0;
+  @override
+  void initState() {
+    super.initState();
+    _currentValue = widget.value!;
+  }
+  void _onChangeEnd(double newValue) {
+    setState(() {
+      _currentValue = newValue;
+    });
+    widget.onValueChanged!(newValue);
+  }
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -122,7 +133,12 @@ class _FanContainerState extends State<FanContainer> {
                   max: 5.0,
                   divisions: 5,
                   value: widget.value!,
-                  onChanged: widget.switchButton,
+                  onChanged: (double newValue) {
+                    setState(() {
+                      _currentValue = newValue;
+                    });
+                  },
+                  onChangeEnd: _onChangeEnd,
                 ),
               ),
             ],

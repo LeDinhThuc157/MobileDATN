@@ -27,6 +27,34 @@ class ValueProvider extends ChangeNotifier {
   ValueProvider() {
     value.listDevice = [];
   }
+  ValueDeviceClass valueD = ValueDeviceClass(
+    device_id: '',
+    status: false,
+    lastReceived: DateTime.now(),
+    deviceName: '',
+    version: '1.0.0',
+    tem: 0,
+    hum: 0,
+    vMq2: 0,
+    dr1: 0,
+    dm1: 0,
+    ds1: 0,
+    dr2: 0,
+    dm2: 0,
+    ds2: 0,
+    fn1: 0,
+    fs1: 0,
+    fn2: 0,
+    fs2: 0,
+    ld1: 0,
+    lm1: 0,
+    ls1: 0,
+    ld2: 0,
+    lm2: 0,
+    ls2: 0,
+    bs: 0,
+  );
+
   void fetchValue() async {
     ApiViewListDevice res = await Request();
     Map<String, dynamic> map = res.userMap;
@@ -39,46 +67,55 @@ class ValueProvider extends ChangeNotifier {
     for(var id in list_device){
       ApiDeviceDetails response = await RequestDevice(id);
       Map<String, dynamic> userMap = response.userMap;
-      ValueDeviceClass value = ValueDeviceClass();
-      value.device_id = id;
-      value.status = userMap['Status'];
-      value.lastReceived = DateTime.parse(userMap['lastReceived']);
-      value.deviceName = userMap['Device_name'];
-      value.version = userMap['version_running'] == null ? '' : userMap['version_running'];
-      value.tem = userMap['lastData']['tem'] == null ? 0 : userMap['lastData']['tem'];
-      value.hum = userMap['lastData']['hum'] == null ? 0 : userMap['lastData']['hum'];
-      value.vMq2 = userMap['lastData']['mq2'] == null ? 0 : userMap['lastData']['mq2'];
-      value.dr1 = userMap['lastData']['dr1'] == null ? 0 : userMap['lastData']['dr1'];
-      value.dr2 = userMap['lastData']['dr2'] == null ? 0 : userMap['lastData']['dr2'];
-      value.dm1 = userMap['lastData']['dm1'] == null ? 0 : userMap['lastData']['dm1'];
-      value.dm2 = userMap['lastData']['dm2'] == null ? 0 : userMap['lastData']['dm2'];
-      value.ds1 = userMap['lastData']['ds1'] == null ? 0 : userMap['lastData']['ds1'];
-      value.ds2 = userMap['lastData']['ds2'] == null ? 0 : userMap['lastData']['ds2'];
-      value.fn1 = userMap['lastData']['fn1'] == null ? 0 : userMap['lastData']['fn1'];
-      value.fn2 = userMap['lastData']['fn2'] == null ? 0 : userMap['lastData']['fn2'];
-      value.fs1 = userMap['lastData']['fs1'] == null ? 0 : userMap['lastData']['fs1'];
-      value.fs2 = userMap['lastData']['fs2'] == null ? 0 : userMap['lastData']['fs2'];
-      value.ld1 = userMap['lastData']['ld1'] == null ? 0 : userMap['lastData']['ld1'];
-      value.ld2 = userMap['lastData']['ld2'] == null ? 0 : userMap['lastData']['ld2'];
-      value.lm1 = userMap['lastData']['lm1'] == null ? 0 : userMap['lastData']['lm1'];
-      if (userMap['lastData']['lm2'] == null) {
-        value.lm2 = 0;
-      } else {
-        value.lm2 = userMap['lastData']['lm2'];
+      print("Check: ${userMap}");
+      valueD.device_id = id;
+      valueD.status = userMap['Status'];
+      valueD.lastReceived = DateTime.parse(userMap['lastReceived']);
+      valueD.deviceName = userMap['Device_name'];
+      valueD.version = userMap['version_running'] == null ? '' : userMap['version_running'];
+      if(userMap['lastData'] == null){
+        print("Matas ketes noi????????");
+      }else{
+        valueD.tem = userMap['lastData']['tem'] == null ? 0 : userMap['lastData']['tem'];
+        valueD.hum = userMap['lastData']['hum'] == null ? 0 : userMap['lastData']['hum'];
+        valueD.vMq2 = userMap['lastData']['mq2'] == null ? 0 : userMap['lastData']['mq2'];
+        valueD.dr1 = userMap['lastData']['dr1'] == null ? 0 : userMap['lastData']['dr1'];
+        valueD.dr2 = userMap['lastData']['dr2'] == null ? 0 : userMap['lastData']['dr2'];
+        valueD.dm1 = userMap['lastData']['dm1'] == null ? 0 : userMap['lastData']['dm1'];
+        valueD.dm2 = userMap['lastData']['dm2'] == null ? 0 : userMap['lastData']['dm2'];
+        valueD.ds1 = userMap['lastData']['ds1'] == null ? 0 : userMap['lastData']['ds1'];
+        valueD.ds2 = userMap['lastData']['ds2'] == null ? 0 : userMap['lastData']['ds2'];
+        valueD.fn1 = userMap['lastData']['fn1'] == null ? 0 : userMap['lastData']['fn1'];
+        valueD.fn2 = userMap['lastData']['fn2'] == null ? 0 : userMap['lastData']['fn2'];
+        valueD.fs1 = userMap['lastData']['fs1'] == null ? 0 : userMap['lastData']['fs1'];
+        valueD.fs2 = userMap['lastData']['fs2'] == null ? 0 : userMap['lastData']['fs2'];
+        valueD.ld1 = userMap['lastData']['ld1'] == null ? 0 : userMap['lastData']['ld1'];
+        valueD.ld2 = userMap['lastData']['ld2'] == null ? 0 : userMap['lastData']['ld2'];
+        valueD.lm1 = userMap['lastData']['lm1'] == null ? 0 : userMap['lastData']['lm1'];
+        if (userMap['lastData']['lm2'] == null) {
+          valueD.lm2 = 0;
+        } else {
+          valueD.lm2 = userMap['lastData']['lm2'];
+        }
+        if(valueD.fs1 == -1) valueD.fs1 = 0;
+        if(valueD.fs2 == -1) valueD.fs2 = 0;
+        valueD.ls1 = userMap['lastData']['ls1'] == null ? 0 : userMap['lastData']['ls1'];
+        valueD.ls2 = userMap['lastData']['ls2'] == null ? 0 : userMap['lastData']['ls2'];
+        valueD.bs = userMap['lastData']['bs'] == null ? 0 : userMap['lastData']['bs'];
+        setValue(valueD.ls1,valueD.ls2,valueD.ds1,valueD.ds2,valueD.dm1,valueD.dm2,valueD.lm1,valueD.lm2, valueD.fs1, valueD.fs2);
+        valueL.listDevice.add(valueD);
       }
-      value.ls1 = userMap['lastData']['ls1'] == null ? 0 : userMap['lastData']['ls1'];
-      value.ls2 = userMap['lastData']['ls2'] == null ? 0 : userMap['lastData']['ls2'];
-      value.bs = userMap['lastData']['bs'] == null ? 0 : userMap['lastData']['bs'];
-      valueL.listDevice.add(value);
-      setValue(value.ls1,value.ls2,value.ds1,value.ds2,value.dm1,value.dm2,value.lm1,value.lm2, value.fs1, value.fs2);
     }
     _valueL = valueL;
     notifyListeners();
   }
 
+  void checkValue(){
+
+  }
   void startFetching() {
     fetchValue();
-    Timer.periodic(Duration(seconds: 10), (timer) {
+    Timer.periodic(Duration(seconds: 2), (timer) {
       fetchValue();
     });
   }

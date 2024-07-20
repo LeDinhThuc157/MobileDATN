@@ -1,4 +1,4 @@
-String ip = "http://192.168.0.113:8888";
+String ip = "http://192.168.170.212:8888";
 String address = "$ip/api/";
 String addressLogin = address + "LoginAPI/UsersLogin";
 String addressChangePass = address + "LoginAPI/UserChangePassword";

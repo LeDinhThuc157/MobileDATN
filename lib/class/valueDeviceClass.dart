@@ -1,62 +1,63 @@
 import '../api/apiRDeviceDetails.dart';
 
 class ValueDeviceClass{
-  late String device_id;
-  late bool status;
-  late DateTime lastReceived;
-  late String deviceName;
-  late String version;
+  String device_id;
+  bool status;
+  DateTime lastReceived;
+  String deviceName;
+  String version;
 
-  late double tem;
-  late double hum;
-  late double vMq2;
-  late double dr1; //Cửa 1 hoạt động hay không
-  late double dm1; // Chế độ hoạt động của auto của cửa 1
-  late double ds1; // Cửa 1 đóng hay mở
-  late double dr2; //  Cửa 2 hoạt động hay không
-  late double dm2; // Chế độ hoạt động của auto của cửa 2
-  late double ds2; // Cửa 2 đóng hay mở
+  double tem;
+  double hum;
+  double vMq2;
+  double dr1;
+  double dm1;
+  double ds1;
+  double dr2;
+  double dm2;
+  double ds2;
 
-  late double fn1; // Quạt 1 có hoạt động hay không
-  late double fs1; // Mức chạy của quạt 1
-  late double fn2; // Quạt 1 có hoạt động hay không
-  late double fs2; // Mức chạy của quạt 1
+  double fn1;
+  double fs1;
+  double fn2;
+  double fs2;
 
-  late double ld1; // Đèn 1 hoạt động hay không
-  late double lm1; // Chế độ hoạt động của auto của đèn 1
-  late double ls1; // Đèn 1 đóng hay mở
-  late double ld2; // Đèn 2 hoạt động hay không
-  late double lm2; // Chế độ hoạt động của auto của dèn 2
-  late double ls2; // Đèn 2 đóng hay mở
+  double ld1;
+  double lm1;
+  double ls1;
+  double ld2;
+  double lm2;
+  double ls2;
 
-  late double bs; // Chế độ còi
-  ValueDeviceClass(){
-    device_id = '';
-    status = false;
-    lastReceived = DateTime.now();
-    deviceName = '';
-    version = '';
-    tem = -1;
-    hum = -1;
-    vMq2 = -1;
-    dr1 = -1;
-    dr2 = -1;
-    dm1 = -1;
-    dm2 = -1;
-    ds1 = -1;
-    ds2 = -1;
-    fn1 = -1;
-    fn2 = -1;
-    fs1 = -1;
-    fs2 = -1;
-    ld1 = -1;
-    ld2 = -1;
-    lm1 = -1;
-    lm2 = -1;
-    ls1 = -1;
-    ls2 = -1;
-    bs = -1;
-  }
+  double bs;
+
+  ValueDeviceClass({
+    required this.device_id,
+    required this.status,
+    required this.lastReceived,
+    required this.deviceName,
+    required this.version,
+    required this.tem,
+    required this.hum,
+    required this.vMq2,
+    required this.dr1,
+    required this.dm1,
+    required this.ds1,
+    required this.dr2,
+    required this.dm2,
+    required this.ds2,
+    required this.fn1,
+    required this.fs1,
+    required this.fn2,
+    required this.fs2,
+    required this.ld1,
+    required this.lm1,
+    required this.ls1,
+    required this.ld2,
+    required this.lm2,
+    required this.ls2,
+    required this.bs,
+  });
 }
 
 // Future<dynamic> RequestValue() async {

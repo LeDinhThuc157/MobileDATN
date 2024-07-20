@@ -438,7 +438,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                         ],
                       ),
                       Container(
-                        height: 500,
+                        height: 450,
                         child: ListView(
                           children: [
                             Row(
@@ -599,7 +599,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                       device: 'Fan',
                                       deviceCount: 'device 1',
                                       itsOn: provider.isFan1On,
-                                      switchButton: (newvalue) {
+                                      onValueChanged: (newvalue) {
+                                        print("Heloo: $newvalue");
                                         provider.fan1Switch(valueDeviceClass.device_id, newvalue);
                                       },
                                       value: provider.valueFan1,
@@ -625,7 +626,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                       device: 'Fan',
                                       deviceCount: 'device 2',
                                       itsOn: provider.isFan2On,
-                                      switchButton: (value) {
+                                      onValueChanged: (value) {
                                         provider.fan2Switch(valueDeviceClass.device_id, value);
                                       },
                                       value: provider.valueFan2,

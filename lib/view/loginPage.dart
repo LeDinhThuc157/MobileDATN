@@ -1,4 +1,6 @@
 
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -52,36 +54,72 @@ class _LoginPageState extends State<LoginPage> {
   // }
 
   Future<void>  sentLogin() async {
-    ApiLogin response =
-    await login(emailController.text, passwordController.text);
-    Map<String, dynamic> userMap = response.userMap;
+    try{
+      var t1 = DateTime.now();
 
-    // print("Phan hoi: ${response.statusResponse}");
-    // print("${userMap["tokenkey"]}");
-    if (response.statusResponse == 200) {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString("tokenKey", userMap["tokenkey"]);
-      await prefs.setString("username", userMap["username"]);
+      ApiLogin response =
+      await login(emailController.text, passwordController.text).timeout(Duration(milliseconds: 100),
+        onTimeout: () {
+        throw TimeoutException("Mất kết nối, vui lòng thử lại.");
+      },);
+      var t2 = DateTime.now();
+      var duration = t2.difference(t1).inMilliseconds;
+      print("Time: $duration ms");
+      Map<String, dynamic> userMap = response.userMap;
 
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => ListRoom()));
-    } else {
+      // print("Phan hoi: ${response.statusResponse}");
+      // print("${userMap["tokenkey"]}");
+      if (response.statusResponse == 200) {
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString("tokenKey", userMap["tokenkey"]);
+        await prefs.setString("username", userMap["username"]);
+
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => ListRoom()));
+      }
+      else {
+        showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(
+                      20.0,
+                    ),
+                  ),
+                ),
+                title: Text(
+                  "Thông báo lỗi!",
+                  style: TextStyle(fontSize: 24.0),
+                ),
+                content: Text("Lỗi xuất hiện: ${response.error}"),
+                actions: [
+                  TextButton(
+                    child: Text("OK"),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  )
+                ],
+              );
+            });
+      }
+    } on TimeoutException catch (e){
       showDialog(
           context: context,
           builder: (context) {
             return AlertDialog(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(
-                  Radius.circular(
-                    20.0,
-                  ),
+                  Radius.circular(20.0),
                 ),
               ),
               title: Text(
                 "Thông báo lỗi!",
                 style: TextStyle(fontSize: 24.0),
               ),
-              content: Text("Lỗi xuất hiện: ${response.error}"),
+              content: Text(e.message.toString()),
               actions: [
                 TextButton(
                   child: Text("OK"),
@@ -93,7 +131,7 @@ class _LoginPageState extends State<LoginPage> {
             );
           });
     }
-  }
+    }
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +150,7 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   Container(
                     child: Image.asset(
-                      "assets/icons/AITHINGS.png",
+                      "assets/icons/smart-home.png", scale: 5,
                       height: 300,
                       width: 315.93 * width,
                     ),

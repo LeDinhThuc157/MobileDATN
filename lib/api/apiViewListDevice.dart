@@ -1,7 +1,10 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smart_home/view/loginPage.dart';
 
 import '../res/vaule.dart';
 
@@ -30,6 +33,8 @@ Future<dynamic> Request() async {
     Map<String, dynamic> userMap = jsonDecode(response.toString());
     int statusResponse = response.statusCode!;
     return ApiViewListDevice(userMap, statusResponse, '');
+  }on TimeoutException catch (e){
+    return ApiViewListDevice({}, -1,e.message.toString());
   }catch(e){
     String error = e.toString();
     if(error == "FormatException: Unexpected character (at character 1)\nAccount not exist\n^\n"){
@@ -39,5 +44,5 @@ Future<dynamic> Request() async {
       error = "Không có kết nỗi!";
     }
     return ApiViewListDevice({}, -1,error);
-  }
+  } 
 }
